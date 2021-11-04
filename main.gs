@@ -14,8 +14,7 @@ function summarizeEnquete(){
   const inputSheet = ss.getSheetByName(INPUT_SHEET_NAME);
   const inputValues = inputSheet.getDataRange().getValues();
   const targetYear = (new Date()).getFullYear();
-  //const fromDate = new Date(targetYear, 4, 1, 0, 0, 0);
-  const fromDate = new Date(2020, 4, 1, 0, 0, 0);
+  const fromDate = new Date(targetYear, 4, 1, 0, 0, 0);
   // Extract only the records for the current year. 
   const targetValues = inputValues.filter(x => x[0] > fromDate);
   let outputValues = targetValues.map(x => {
@@ -47,12 +46,22 @@ function summarizeEnquete(){
   const outputProbremSheet = addSheet(ss, '画面回答（' + targetYear + '年度）');
   let probremEditValues = [['使用期間', '画面URL', '問題点']];
   for (let i = 6; i <= 14; i = i + 2){
-    let temp = targetValues.map(x => [x[2]].concat(x.slice(i, i + 2))).filter(x => x[2] != '');
-    probremEditValues = probremEditValues.concat(temp);
+    let temp = targetValues.map(x => [x[2]].concat(x.slice(i, i + 2)));
+    probremEditValues = editProbrems(probremEditValues, temp);
   }
-  temp = targetValues.map(x => [x[2]].concat(x.slice(16, 18))).filter(x => x[1] != '');
-  probremEditValues = probremEditValues.concat(temp);
+  let temp = targetValues.map(x => [x[2], ''].concat(x.slice(16, 17)));
+  probremEditValues = editProbrems(probremEditValues, temp);
   outputProbremSheet.getRange(1, 1, probremEditValues.length, probremEditValues[0].length).setValues(probremEditValues);
+}
+/**
+ * Edit the probrems.
+ * @param {Array.<string>} Array to concat
+ * @param {Array.<string>} Value of the extraction source
+ * @return {Array.<string>}
+ */
+function editProbrems(inputArray, targetValue){
+  const temp = targetValue.filter(x => x[2] != '');
+  return inputArray.concat(temp);
 }
 /**
  * Create a table to output a graph.
