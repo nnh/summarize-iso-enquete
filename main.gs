@@ -46,12 +46,11 @@ function summarizeEnquete(){
   // Output probrems.
   const outputProbremSheet = addSheet(ss, '画面回答（' + targetYear + '年度）');
   let probremEditValues = [['使用期間', '画面URL', '問題点']];
-  for (let i = 6; i <= 14; i = i + 2){
-    let temp = targetValues.map(x => [x[2]].concat(x.slice(i, i + 2)));
+  const probremTargetValues = targetValues.map(x => x.concat(''));
+  for (let i = 6; i <= 16; i = i + 2){
+    let temp = probremTargetValues.map(x => [x[2]].concat(x.slice(i, i + 2)));
     probremEditValues = editProbrems(probremEditValues, temp);
   }
-  let temp = targetValues.map(x => [x[2], ''].concat(x.slice(16, 17)));
-  probremEditValues = editProbrems(probremEditValues, temp);
   outputProbremSheet.getRange(1, 1, probremEditValues.length, probremEditValues[0].length).setValues(probremEditValues);
 }
 /**
@@ -61,8 +60,27 @@ function summarizeEnquete(){
  * @return {Array.<string>}
  */
 function editProbrems(inputArray, targetValue){
-  const temp = targetValue.filter(x => x[2] != '');
-  return inputArray.concat(temp);
+  const URL_INDEX = 1;
+  const ANSWER_INDEX = 2
+  const temp = targetValue.filter(x => x[ANSWER_INDEX] != '' || x[URL_INDEX] != '');
+  // If the URL and answer are the same, split them.
+  const STR_URL = /https?:\/\/[-_.!~*\'()a-zA-Z0-9;\/?:\@&=+\$,%#]+/;
+  const temp2 = temp.map(x => {
+    const checkUrl = x[URL_INDEX].match(STR_URL);
+    const checkAnswer = x[URL_INDEX].replace(checkUrl, '').trim();
+    if (checkAnswer != ''){
+      x[URL_INDEX] = checkUrl;
+      x[ANSWER_INDEX] = checkAnswer;
+    }
+    return x;
+  });
+  /*const checkUrl = temp[URL_INDEX].match(STR_URL);
+  if (!checkUrl){
+    const checkAnswer = temp[URL_INDEX].replace(checkUrl, '');
+    temp[URL_INDEX] = checkUrl.trim();
+    temp[ANSWER_INDEX] = checkAnswer.trim();
+  }*/
+  return inputArray.concat(temp2);
 }
 /**
  * Create a table to output a graph.
