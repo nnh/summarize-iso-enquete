@@ -6,9 +6,10 @@
 function summarizeEnquete(){
   const INPUT_SHEET_NAME = 'フォームの回答 1'; 
   const USAGE_PERIOD = {0:'半年以下',
-                        1:'1年～3年程度',
-                        2:'3年～5年程度',
-                        3:'5年以上'}
+                        1:'半年～1年程度',
+                        2:'1年～3年程度',
+                        3:'3年～5年程度',
+                        4:'5年以上'}
   const OUTPUT_HEADER = ['使用期間', '初期メニューの構成、操作の分かり易さ', '画面遷移の分かり易さ', '操作中の反応'];
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const inputSheet = ss.getSheetByName(INPUT_SHEET_NAME);
@@ -106,9 +107,9 @@ function editTable(outputSheet, targetValues, OUTPUT_HEADER, USAGE_PERIOD, heade
   outputSheet.getRange(outputStartRow, 2, 1, tableColHeader.length).setValues([tableColHeader]);
   outputStartRow++;
   outputSheet.getRange(outputStartRow, 2, tableValues.length, tableValues[0].length).setValues(tableValues);
-  const chartSourceRange = outputSheet.getRange(tableStartRow + 1, 1, tableValues.length, tableRowHeader.length);
+  const chartSourceRange = outputSheet.getRange(tableStartRow + 1, 1, tableValues.length, tableValues.length);
   chartSourceRange.setBorder(true, true, true, true, true, true);
-  const sumRow = outputSheet.getRange(chartSourceRange.getLastRow() + 1, 1, 1, tableRowHeader.length);
+  const sumRow = outputSheet.getRange(chartSourceRange.getLastRow() + 1, 1, 1, tableValues.length);
   sumRow.setBorder(true, true, true, true, true, true);
   sumRow.setBorder(true, null, null, null, null, null, null, SpreadsheetApp.BorderStyle.SOLID_THICK);
   const nextStartRow = editChart(outputSheet, chartSourceRange);
